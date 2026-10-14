@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # User analytics: tracker, API and dashboard
 
 A small full-stack app that records `page_view` and `click` events from any web page, stores them in MongoDB, and shows them in a React dashboard (session journeys and a click heatmap). The whole project deploys to **one Vercel project**.
@@ -102,3 +103,6 @@ One flat `events` collection (`server/models/Event.js`). Indexes: `{ sessionId, 
 - **Open ingestion endpoint:** no auth, rate limiting or bot filtering on `POST /api/events`. `CORS_ORIGINS` only limits which browser origins can read responses.
 - **Scale limits:** the sessions list runs a `$group` over all events per request, and the heatmap returns at most the latest 10,000 clicks. For large volumes, precompute a sessions collection and bin clicks on the server.
 - **Not included:** dashboard login, automated tests, scroll/hover tracking.
+=======
+# User-Analytics
+>>>>>>> e1f0d9abbf1f46bdf4df794c039f7e2c9f2ffbb2
