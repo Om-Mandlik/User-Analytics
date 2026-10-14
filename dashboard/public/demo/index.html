@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kettle & Co. — Demo store</title>
+  <style>
+    :root{--ink:#2b2118;--paper:#fbf7f0;--line:#e6dccb;--accent:#b4532a;--card:#fff}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Georgia,serif;color:var(--ink);background:var(--paper)}
+    button{font:inherit;cursor:pointer}
+    a{color:inherit}
+    :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+    nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:16px 48px;background:var(--paper);border-bottom:1px solid var(--line)}
+    nav .links{display:flex;align-items:center;gap:24px}
+    nav a{text-decoration:none}
+    .logo{font-weight:bold;font-size:22px}
+    .cart-btn{display:flex;gap:8px;align-items:center;background:var(--ink);color:#fff;border:0;border-radius:999px;padding:8px 16px}
+    .cart-btn .count{background:var(--accent);border-radius:999px;min-width:22px;padding:0 6px;text-align:center;font-size:14px}
+    .bump{animation:bump .3s}
+    @keyframes bump{50%{transform:scale(1.25)}}
+
+    .hero{padding:90px 48px 70px;text-align:center}
+    .hero h1{font-size:56px;margin:0 0 16px}
+    .hero p{font-size:19px;margin:0 auto 32px;max-width:520px}
+    .btn{display:inline-block;padding:12px 24px;background:var(--ink);color:#fff;border:0;border-radius:4px;font-size:16px;text-decoration:none}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+    .btn.small{padding:8px 14px;font-size:14px}
+
+    section{padding:48px}
+    h2{font-size:30px;margin:0 0 20px}
+    .chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+    .chip{padding:8px 18px;border:1px solid var(--ink);background:transparent;border-radius:999px}
+    .chip[aria-pressed=true]{background:var(--ink);color:#fff}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:24px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:8px}
+    .swatch{height:140px;border-radius:4px;border:0;width:100%}
+    .card h3{margin:4px 0 0;font-size:18px}
+    .card .row{display:flex;gap:8px;margin-top:auto}
+    .card .row .btn{flex:1;text-align:center}
+
+    .banner{margin:0 48px;padding:56px;background:var(--ink);color:#fff;text-align:center;border-radius:8px}
+    .banner .btn{background:var(--paper);color:var(--ink)}
+
+    .slider{max-width:640px;margin:0 auto;text-align:center}
+    .slide{min-height:110px;font-size:22px;font-style:italic}
+    .slider-nav{display:flex;gap:12px;justify-content:center;align-items:center}
+    .arrow{width:40px;height:40px;border-radius:50%;border:1px solid var(--ink);background:transparent}
+    .dot{width:10px;height:10px;border-radius:50%;border:0;background:var(--line);padding:0}
+    .dot[aria-current=true]{background:var(--ink)}
+
+    .faq{max-width:720px;margin:0 auto}
+    details{border-bottom:1px solid var(--line);padding:14px 0}
+    summary{cursor:pointer;font-weight:bold}
+    details p{margin:10px 0 0}
+
+    .signup{max-width:520px;margin:0 auto;text-align:center}
+    .signup form{display:flex;gap:8px}
+    .signup input{flex:1;padding:12px;border:1px solid var(--ink);border-radius:4px;font:inherit}
+    .signup .msg{min-height:24px;margin-top:10px}
+    .signup .msg.err{color:#b3261e}
+    footer{padding:48px;color:#7a6b58;text-align:center}
+
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;z-index:20}
+    .overlay.open{display:block}
+    .drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,100%);background:var(--paper);z-index:30;padding:24px;transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column}
+    .drawer.open{transform:none}
+    .drawer header{display:flex;justify-content:space-between;align-items:center}
+    .drawer h2{margin:0;font-size:24px}
+    .close{border:0;background:none;font-size:28px;line-height:1}
+    .lines{flex:1;overflow:auto;margin:16px 0;padding:0;list-style:none}
+    .lines li{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+    .qty{display:flex;align-items:center;gap:8px}
+    .qty button{width:28px;height:28px;border:1px solid var(--ink);background:transparent;border-radius:4px}
+    .remove{border:0;background:none;color:#b3261e;text-decoration:underline;padding:0;justify-self:end}
+    .total{display:flex;justify-content:space-between;font-size:20px;margin-bottom:12px}
+    .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(460px,92vw);background:var(--paper);border-radius:8px;padding:28px;z-index:30;display:none}
+    .modal.open{display:block}
+    .modal .swatch{height:180px;margin-bottom:16px}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:999px;transition:transform .25s;z-index:40}
+    .toast.show{transform:translateX(-50%)}
+    @media(max-width:640px){nav,section{padding-left:20px;padding-right:20px}.banner{margin:0 20px}.hero h1{font-size:40px}}
+  </style>
+  <script src="/tracker.js" defer></script>
+</head>
+<body>
+  <nav>
+    <span class="logo">Kettle & Co.</span>
+    <div class="links">
+      <a href="/demo/index.html">Shop</a>
+      <a href="/demo/pricing.html">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <button class="cart-btn" id="open-cart" aria-label="Open cart">Cart <span class="count" id="cart-count">0</span></button>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <h1>Tea, brewed properly.</h1>
+    <p>Hand-picked loose leaf teas and the kit to make them. Click around: every click is tracked.</p>
+    <button class="btn" id="shop-now">Shop now</button>
+    <a class="btn ghost" href="/demo/pricing.html">Join the tea club</a>
+  </header>
+
+  <section id="shop">
+    <h2>Shop</h2>
+    <div class="chips" id="filters" role="group" aria-label="Filter products">
+      <button class="chip" data-cat="all" aria-pressed="true">All</button>
+      <button class="chip" data-cat="black" aria-pressed="false">Black</button>
+      <button class="chip" data-cat="green" aria-pressed="false">Green</button>
+      <button class="chip" data-cat="gear" aria-pressed="false">Gear</button>
+    </div>
+    <div class="grid" id="products"></div>
+  </section>
+
+  <div class="banner">
+    <h2>Free shipping over $40</h2>
+    <a class="btn" href="/demo/pricing.html">See club pricing</a>
+  </div>
+
+  <section>
+    <h2 style="text-align:center">What drinkers say</h2>
+    <div class="slider">
+      <div class="slide" id="slide" aria-live="polite"></div>
+      <div class="slider-nav">
+        <button class="arrow" id="prev" aria-label="Previous review">&lsaquo;</button>
+        <span id="dots"></span>
+        <button class="arrow" id="next" aria-label="Next review">&rsaquo;</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <h2 style="text-align:center">Questions</h2>
+    <div class="faq">
+      <details><summary>How fast do you ship?</summary><p>Orders leave within 24 hours and arrive in 3 to 5 days.</p></details>
+      <details><summary>Can I return opened tea?</summary><p>Yes. If you don't love it, we'll refund it within 30 days.</p></details>
+      <details><summary>Is the tea organic?</summary><p>Most of our range is certified organic. It's marked on each product.</p></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="signup">
+      <h2>Get the brew notes</h2>
+      <form id="signup" novalidate>
+        <input type="email" id="email" placeholder="you@example.com" aria-label="Email address">
+        <button class="btn" type="submit">Subscribe</button>
+      </form>
+      <div class="msg" id="signup-msg" role="status"></div>
+    </div>
+  </section>
+
+  <footer>© Kettle & Co. A demo page for the analytics tracker.</footer>
+
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="drawer" id="drawer" aria-label="Shopping cart" aria-hidden="true">
+    <header><h2>Your cart</h2><button class="close" id="close-cart" aria-label="Close cart">&times;</button></header>
+    <ul class="lines" id="lines"></ul>
+    <div class="total"><span>Total</span><strong id="total">$0.00</strong></div>
+    <button class="btn" id="checkout">Checkout</button>
+  </aside>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <button class="close" id="close-modal" aria-label="Close" style="position:absolute;top:12px;right:16px">&times;</button>
+    <div class="swatch" id="m-swatch"></div>
+    <h3 id="m-title" style="margin:0 0 4px;font-size:24px"></h3>
+    <p id="m-desc"></p>
+    <p><strong id="m-price"></strong></p>
+    <button class="btn" id="m-add">Add to cart</button>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+  (function () {
+    var PRODUCTS = [
+      { id: 1, name: 'Darjeeling First Flush', cat: 'black', price: 18, color: '#c9a36b', desc: 'Bright, muscatel and floral. Best brewed at 90°C for 3 minutes.' },
+      { id: 2, name: 'Assam Breakfast', cat: 'black', price: 14, color: '#8a4b2a', desc: 'Malty and bold. Takes milk well.' },
+      { id: 3, name: 'Genmaicha', cat: 'green', price: 16, color: '#9bb06a', desc: 'Green tea with toasted rice. Nutty and mellow.' },
+      { id: 4, name: 'Sencha Supreme', cat: 'green', price: 20, color: '#6f9a58', desc: 'Grassy and sweet, with a clean finish.' },
+      { id: 5, name: 'Cast iron kettle', cat: 'gear', price: 58, color: '#3a3a3a', desc: 'Holds 0.8 litres. Keeps water hot for an hour.' },
+      { id: 6, name: 'Bamboo infuser', cat: 'gear', price: 12, color: '#d9c18b', desc: 'Fine mesh basket that fits any mug.' }
+    ];
+    var REVIEWS = [
+      '“The Darjeeling made me throw out my teabags.” — Priya',
+      '“Arrived fast and smells incredible.” — Marcus',
+      '“The kettle is a work of art.” — Lena'
+    ];
+    var cart = {};
+    var activeCat = 'all';
+    var viewing = null;
+    var $ = function (id) { return document.getElementById(id); };
+    var money = function (n) { return '$' + n.toFixed(2); };
+    var byId = function (id) { return PRODUCTS.filter(function (p) { return p.id === id; })[0]; };
+
+    /* products + filter */
+    function renderProducts() {
+      $('products').innerHTML = PRODUCTS.filter(function (p) { return activeCat === 'all' || p.cat === activeCat; })
+        .map(function (p) {
+          return '<article class="card"><button class="swatch" data-view="' + p.id + '" style="background:' + p.color + '" aria-label="Quick view ' + p.name + '"></button>' +
+            '<h3>' + p.name + '</h3><span>' + money(p.price) + '</span>' +
+            '<div class="row"><button class="btn small ghost" data-view="' + p.id + '">Details</button>' +
+            '<button class="btn small" data-add="' + p.id + '">Add to cart</button></div></article>';
+        }).join('');
+    }
+    $('filters').addEventListener('click', function (e) {
+      var b = e.target.closest('.chip'); if (!b) return;
+      activeCat = b.dataset.cat;
+      [].forEach.call(document.querySelectorAll('.chip'), function (c) { c.setAttribute('aria-pressed', c === b); });
+      renderProducts();
+    });
+    $('products').addEventListener('click', function (e) {
+      var add = e.target.closest('[data-add]'), view = e.target.closest('[data-view]');
+      if (add) addToCart(+add.dataset.add);
+      else if (view) openModal(+view.dataset.view);
+    });
+
+    /* cart */
+    function count() { return Object.keys(cart).reduce(function (n, id) { return n + cart[id]; }, 0); }
+    function renderCart() {
+      var ids = Object.keys(cart), total = 0;
+      $('lines').innerHTML = ids.length ? ids.map(function (id) {
+        var p = byId(+id), q = cart[id]; total += p.price * q;
+        return '<li><strong>' + p.name + '</strong><span>' + money(p.price * q) + '</span>' +
+          '<div class="qty"><button data-dec="' + id + '" aria-label="Decrease">−</button><span>' + q + '</span><button data-inc="' + id + '" aria-label="Increase">+</button></div>' +
+          '<button class="remove" data-rm="' + id + '">Remove</button></li>';
+      }).join('') : '<li style="display:block">Your cart is empty. Add some tea.</li>';
+      $('total').textContent = money(total);
+      $('cart-count').textContent = count();
+      $('checkout').disabled = !ids.length;
+    }
+    function addToCart(id) {
+      cart[id] = (cart[id] || 0) + 1;
+      renderCart();
+      var c = $('cart-count'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
+      toast('Added ' + byId(id).name);
+    }
+    $('lines').addEventListener('click', function (e) {
+      var t = e.target;
+      if (t.dataset.inc) cart[t.dataset.inc]++;
+      else if (t.dataset.dec) { if (--cart[t.dataset.dec] <= 0) delete cart[t.dataset.dec]; }
+      else if (t.dataset.rm) delete cart[t.dataset.rm];
+      else return;
+      renderCart();
+    });
+    function openCart() { $('drawer').classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('overlay').classList.add('open'); }
+    function closeAll() {
+      $('drawer').classList.remove('open'); $('drawer').setAttribute('aria-hidden', 'true');
+      $('modal').classList.remove('open'); $('overlay').classList.remove('open');
+    }
+    $('open-cart').addEventListener('click', openCart);
+    $('close-cart').addEventListener('click', closeAll);
+    $('overlay').addEventListener('click', closeAll);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
+    $('checkout').addEventListener('click', function () {
+      cart = {}; renderCart(); closeAll(); toast('Order placed. Thanks for testing!');
+    });
+
+    /* quick-view modal */
+    function openModal(id) {
+      var p = byId(id); viewing = id;
+      $('m-swatch').style.background = p.color;
+      $('m-title').textContent = p.name; $('m-desc').textContent = p.desc; $('m-price').textContent = money(p.price);
+      $('modal').classList.add('open'); $('overlay').classList.add('open');
+    }
+    $('close-modal').addEventListener('click', closeAll);
+    $('m-add').addEventListener('click', function () { addToCart(viewing); closeAll(); });
+
+    /* reviews slider */
+    var idx = 0;
+    function renderSlide() {
+      $('slide').textContent = REVIEWS[idx];
+      $('dots').innerHTML = REVIEWS.map(function (_, i) {
+        return '<button class="dot" data-i="' + i + '" aria-label="Review ' + (i + 1) + '"' + (i === idx ? ' aria-current="true"' : '') + '></button>';
+      }).join(' ');
+    }
+    $('prev').addEventListener('click', function () { idx = (idx + REVIEWS.length - 1) % REVIEWS.length; renderSlide(); });
+    $('next').addEventListener('click', function () { idx = (idx + 1) % REVIEWS.length; renderSlide(); });
+    $('dots').addEventListener('click', function (e) { if (e.target.dataset.i) { idx = +e.target.dataset.i; renderSlide(); } });
+
+    /* newsletter form */
+    $('signup').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = $('email').value.trim(), msg = $('signup-msg');
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { msg.className = 'msg err'; msg.textContent = 'Enter a valid email address, like you@example.com.'; return; }
+      msg.className = 'msg'; msg.textContent = 'Subscribed. Check your inbox for the first brew note.'; $('email').value = '';
+    });
+
+    /* misc */
+    $('shop-now').addEventListener('click', function () { $('shop').scrollIntoView({ behavior: 'smooth' }); });
+    var toastTimer;
+    function toast(t) {
+      var el = $('toast'); el.textContent = t; el.classList.add('show');
+      clearTimeout(toastTimer); toastTimer = setTimeout(function () { el.classList.remove('show'); }, 1800);
+    }
+
+    renderProducts(); renderCart(); renderSlide();
+  })();
+  </script>
+</body>
+</html>
