@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # User analytics: tracker, API and dashboard
 
 A small full-stack app that records `page_view` and `click` events from any web page, stores them in MongoDB, and shows them in a React dashboard (session journeys and a click heatmap). The whole project deploys to **one Vercel project**.
