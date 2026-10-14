@@ -43,7 +43,7 @@ export default function App() {
         <div className="brand">
           <Logo />
           <div>
-            <h1>Session trail</h1>
+            <h1>Session Tracker</h1>
             <p>User analytics</p>
           </div>
         </div>
